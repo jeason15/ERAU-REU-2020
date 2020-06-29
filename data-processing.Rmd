@@ -1,0 +1,16 @@
+---
+title: "Data Processing"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readr)
+```
+
+```{r}
+
+data <- read.csv("E:/ProjectData/ERAU-REU/Project-Drone-Behavior/behavior-captures/c1yellow_straight_2_RX1.csv")
+
+```
+
