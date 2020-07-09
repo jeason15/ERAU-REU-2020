@@ -1,0 +1,109 @@
+---
+title: "REU-2020-NN"
+author: "Joshua Eason"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: html_document
+---
+
+
+```{r, warning=FALSE, include=FALSE}
+
+devtools::install_github("rstudio/tensorflow")
+library(tensorflow)
+install_tensorflow(envname = "tf")
+use_condaenv("tf")
+
+
+```
+
+
+```{r}
+data <- read.csv("E:\\ProjectData\\ERAU-REU\\Project-Drone-Behavior\\behavior-captures\\behavior-signal-multiple-processed.csv", sep=",")
+```
+
+```{r}
+
+unique(data$behavior)
+
+```
+
+```{r}
+
+x <- scale(data[,1:1280], center = TRUE, scale = TRUE)
+
+y <- to_categorical(data$behavior,3)
+
+```
+
+```{r}
+
+model1 <- keras_model_sequential() %>%
+    layer_dense(units = 128, input_shape = ncol(x), activation = "relu") %>%
+    layer_dense(units = 64, activation = "relu") %>%
+    layer_dense(units = 3, activation = "softmax") %>%
+    compile(loss="categorical_crossentropy",
+            optimizer = optimizer_sgd(),
+            metrics = c("accuracy"))
+
+fit1 <- model1 %>%
+    fit(x = x,
+        y = y, 
+        epochs = 50,
+        batch_size = 128,
+        validation_split = .2,
+        verbose=FALSE)
+fit1
+plot(fit1)
+
+```
+
+
+```{r}
+
+model2 <- keras_model_sequential() %>%
+    layer_dense(units = 128, input_shape = ncol(wine_x), activation = "relu") %>%
+    layer_dense(units = 64, activation = "relu") %>%
+    layer_dense(units = 10, activation = "softmax") %>%
+    compile(loss="categorical_crossentropy",
+            optimizer = optimizer_adamax(),
+            metrics = c("accuracy"))
+
+fit2 <- model2 %>%
+    fit(x = wine_x,
+        y = wine_y, 
+        epochs = 50,
+        batch_size = 128,
+        validation_split = .2,
+        verbose=FALSE)
+fit2
+plot(fit2)
+
+```
+
+
+```{r}
+
+model3 <- keras_model_sequential() %>%
+    layer_dense(units = 128, input_shape = ncol(wine_x), activation = "relu") %>%
+    layer_batch_normalization() %>%
+    layer_dense(units = 64, activation = "relu") %>%
+    layer_batch_normalization() %>%
+    layer_dense(units = 10, activation = "softmax") %>%
+    compile(loss="categorical_crossentropy",
+            optimizer = optimizer_sgd(),
+            metrics = c("accuracy"))
+
+fit3 <- model3 %>%
+    fit(x = wine_x,
+        y = wine_y, 
+        epochs = 50,
+        batch_size = 128,
+        validation_split = .2,
+        verbose=FALSE)
+
+fit3
+plot(fit3)
+
+summary(model3)
+
+```
